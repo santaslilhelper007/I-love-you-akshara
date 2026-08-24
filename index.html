@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>For Akshara</title>
+  <style>
+    :root {
+      --pink-50: #fff6fb;
+      --pink-100: #ffe6f2;
+      --pink-200: #ffc7df;
+      --pink-300: #ff9fc4;
+      --pink-500: #f45c99;
+      --rose: #cc3d73;
+      --cream: #fffaf3;
+      --ink: #57263c;
+      --soft-ink: #8b526c;
+      --mint: #c9f5e6;
+      --lemon: #fff2a8;
+      --shadow: 0 24px 70px rgba(204, 61, 115, 0.22);
+      --dark-bg: #110711;
+      --dark-panel: #211023;
+      --dark-pink: #ff86bd;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: var(--pink-50);
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden;
+      font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 20% 15%, rgba(255, 255, 255, 0.9) 0 7%, transparent 8%),
+        radial-gradient(circle at 83% 22%, rgba(255, 242, 168, 0.7) 0 6%, transparent 7%),
+        linear-gradient(135deg, #fff9fd 0%, #ffe4f1 43%, #ffd3e7 100%);
+      transition: background 700ms ease, color 700ms ease;
+    }
+
+    body.night {
+      color: #fff3fb;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(255, 134, 189, 0.18) 0 8%, transparent 9%),
+        radial-gradient(circle at 88% 9%, rgba(255, 242, 168, 0.13) 0 6%, transparent 7%),
+        linear-gradient(135deg, #130713 0%, #241126 48%, #3a1730 100%);
+    }
+
+    button {
+      border: 0;
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    .app {
+      position: relative;
+      min-height: 100vh;
+      isolation: isolate;
+      overflow: hidden;
+    }
+
+    .background-pattern {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.75;
+      background-image:
+        radial-gradient(circle, rgba(244, 92, 153, 0.18) 2px, transparent 3px),
+        radial-gradient(circle, rgba(255, 255, 255, 0.78) 2px, transparent 3px);
+      background-position: 0 0, 26px 22px;
+      background-size: 54px 54px;
+      z-index: -2;
+    }
+
+    .floating-heart {
+      position: fixed;
+      width: 18px;
+      height: 18px;
+      pointer-events: none;
+      opacity: 0.46;
+      transform: rotate(45deg);
+      background: var(--pink-300);
+      animation: drift 9s ease-in-out infinite;
+      z-index: -1;
+    }
+
+    .floating-heart::before,
+    .floating-heart::after {
+      content: "";
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: inherit;
+    }
+
+    .floating-heart::before {
+      left: -9px;
+    }
+
+    .floating-heart::after {
+      top: -9px;
+    }
+
+    .floating-heart:nth-child(2) {
+      left: 8%;
+      top: 18%;
+      animation-delay: -1s;
+    }
+
+    .floating-heart:nth-child(3) {
+      right: 10%;
+      top: 17%;
+      width: 13px;
+      height: 13px;
+      animation-delay: -4s;
+      background: #ffbdd7;
+    }
+
+    .floating-heart:nth-child(3)::before,
+    .floating-heart:nth-child(3)::after {
+      width: 13px;
+      height: 13px;
+    }
+
+    .floating-heart:nth-child(3)::before {
+      left: -6.5px;
+    }
+
+    .floating-heart:nth-child(3)::after {
+      top: -6.5px;
+    }
+
+    .floating-heart:nth-child(4) {
+      left: 14%;
+      bottom: 12%;
+      animation-delay: -7s;
+      background: var(--lemon);
+    }
+
+    .floating-heart:nth-child(5) {
+      right: 18%;
+      bottom: 14%;
+      width: 12px;
+      height: 12px;
+      animation-delay: -2s;
+      background: var(--mint);
+    }
+
+    .floating-heart:nth-child(5)::before,
+    .floating-heart:nth-child(5)::after {
+      width: 12px;
+      height: 12px;
+    }
+
+    .floating-heart:nth-child(5)::before {
+      left: -6px;
+    }
+
+    .floating-heart:nth-child(5)::after {
+      top: -6px;
+    }
+
+    .screen {
+      display: none;
+      min-height: 100vh;
+      padding: 28px 18px;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(16px);
+    }
+
+    .screen.active {
+      display: flex;
+      animation: fadeIn 650ms ease forwards;
+    }
+
+    .shell {
+      width: min(100%, 960px);
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .gate {
+      position: relative;
+      width: min(100%, 620px);
+      min-height: min(78vh, 680px);
+      margin: 0 auto;
+      padding: clamp(34px, 8vw, 74px) 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+      text-align: center;
+      border: 3px solid #fff;
+      border-radius: 42% 42% 20px 20px;
+      background:
+        linear-gradient(#fffafd, #fffafd) padding-box,
+        linear-gradient(135deg, #fff, #ffb4d3, #fff2a8) border-box;
+      box-shadow: var(--shadow);
+    }
+
+    .gate::before,
+    .gate::after {
+      content: "";
+      position: absolute;
+      top: -36px;
+      width: 122px;
+      height: 100px;
+      border: 3px solid #fff;
+      background: linear-gradient(145deg, #fff7fb, #ffd9ea);
+      z-index: -1;
+    }
+
+    .gate::before {
+      left: 12%;
+      border-radius: 92% 12% 34% 22%;
+      transform: rotate(-28deg);
+    }
+
+    .gate::after {
+      right: 12%;
+      border-radius: 12% 92% 22% 34%;
+      transform: rotate(28deg);
+    }
+
+    .bow {
+      position: relative;
+      width: 112px;
+      height: 64px;
+      margin-bottom: 4px;
+    }
+
+    .bow::before,
+    .bow::after,
+    .bow span {
+      content: "";
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #ff5f9d;
+      box-shadow: inset 0 -8px rgba(177, 35, 89, 0.18);
+    }
+
+    .bow::before {
+      left: 0;
+      width: 50px;
+      height: 54px;
+      border-radius: 72% 40% 72% 44%;
+      transform: translateY(-50%) rotate(13deg);
+    }
+
+    .bow::after {
+      right: 0;
+      width: 50px;
+      height: 54px;
+      border-radius: 40% 72% 44% 72%;
+      transform: translateY(-50%) rotate(-13deg);
+    }
+
+    .bow span {
+      left: 42px;
+      width: 29px;
+      height: 34px;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 255, 255, 0.52);
+      z-index: 1;
+    }
+
+    h1,
+    h2 {
+      margin: 0;
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      max-width: 10ch;
+      margin: 0 auto;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(3.1rem, 12vw, 6.7rem);
+      color: var(--rose);
+      text-align: center;
+      text-wrap: balance;
+    }
+
+    h2 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2.3rem, 8vw, 4.5rem);
+      color: var(--rose);
+    }
+
+    body.night h2,
+    body.night .night-title {
+      color: var(--dark-pink);
+    }
+
+    .subtext {
+      margin: 14px auto 0;
+      max-width: 36rem;
+      color: var(--soft-ink);
+      font-size: clamp(1rem, 4vw, 1.2rem);
+      line-height: 1.6;
+    }
+
+    body.night .subtext {
+      color: #ffd4e8;
+    }
+
+    .primary-button,
+    .soft-button,
+    .coupon-button {
+      min-height: 54px;
+      padding: 15px 22px;
+      border-radius: 999px;
+      font-weight: 800;
+      color: #fff;
+      background: linear-gradient(135deg, #ff5f9d, #e63982);
+      box-shadow: 0 14px 28px rgba(204, 61, 115, 0.28);
+      transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+    }
+
+    .primary-button:hover,
+    .soft-button:hover,
+    .coupon-button:hover {
+      transform: translateY(-2px);
+      filter: saturate(1.08);
+      box-shadow: 0 18px 34px rgba(204, 61, 115, 0.32);
+    }
+
+    .primary-button:active,
+    .soft-button:active,
+    .coupon-button:active,
+    .menu-card:active,
+    .coupon:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
+    .signature {
+      margin-top: 18px;
+      font-size: 0.95rem;
+      color: var(--soft-ink);
+    }
+
+    .menu-grid {
+      width: min(100%, 760px);
+      margin: 34px auto 0;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .menu-card {
+      position: relative;
+      min-height: 154px;
+      padding: 24px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid transparent;
+      border-radius: 26px;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.95) 0 2px, transparent 3px),
+        radial-gradient(circle at 82% 24%, rgba(255, 242, 168, 0.95) 0 2px, transparent 3px),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(255, 229, 241, 0.98)) padding-box,
+        repeating-linear-gradient(135deg, #fff 0 8px, #ff9fc4 8px 13px, #fff2a8 13px 18px, #ffc7df 18px 25px) border-box;
+      box-shadow:
+        0 0 0 5px rgba(255, 255, 255, 0.46),
+        0 16px 34px rgba(204, 61, 115, 0.16);
+      font-size: clamp(1.04rem, 3.7vw, 1.25rem);
+      font-weight: 850;
+      line-height: 1.25;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .menu-card::before {
+      content: "";
+      position: absolute;
+      top: 13px;
+      right: 15px;
+      width: 34px;
+      height: 24px;
+      border-radius: 50% 50% 46% 46%;
+      background: var(--pink-500);
+      box-shadow: -16px 0 0 var(--pink-500), -8px 3px 0 #d93f7c;
+      transform: rotate(-12deg);
+    }
+
+    .menu-card::after {
+      content: "";
+      position: absolute;
+      inset: -8px;
+      border: 2px dotted rgba(244, 92, 153, 0.45);
+      border-radius: 32px;
+      pointer-events: none;
+    }
+
+    .menu-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 42px rgba(204, 61, 115, 0.22);
+    }
+
+    .menu-card.final {
+      grid-column: 1 / -1;
+      min-height: 112px;
+      background:
+        radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.95) 0 2px, transparent 3px),
+        radial-gradient(circle at 82% 24%, rgba(255, 159, 196, 0.8) 0 2px, transparent 3px),
+        linear-gradient(135deg, #fff, #fff2a8) padding-box,
+        repeating-linear-gradient(135deg, #fff 0 8px, #ff9fc4 8px 13px, #fff2a8 13px 18px, #ffc7df 18px 25px) border-box;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      visibility: hidden;
+      opacity: 0;
+      background: rgba(87, 38, 60, 0.25);
+      backdrop-filter: blur(8px);
+      transition: opacity 260ms ease, visibility 260ms ease;
+      z-index: 10;
+    }
+
+    .modal.open {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .note {
+      position: relative;
+      width: min(100%, 560px);
+      padding: 32px 24px 26px;
+      border: 2px solid #fff;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #fff, #ffe8f3);
+      box-shadow: var(--shadow);
+      transform: scale(0.96);
+      transition: transform 260ms ease;
+    }
+
+    .modal.open .note {
+      transform: scale(1);
+    }
+
+    .note h3 {
+      margin: 0 0 16px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.8rem, 7vw, 2.6rem);
+      color: var(--rose);
+    }
+
+    .note-list,
+    .night-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .note-list li,
+    .night-list li {
+      margin: 12px 0;
+      padding: 14px 16px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.75);
+      line-height: 1.5;
+    }
+
+    .close-button,
+    .back-button {
+      margin-top: 20px;
+      padding: 12px 18px;
+      border-radius: 999px;
+      color: var(--rose);
+      background: #fff;
+      border: 2px solid var(--pink-200);
+      font-weight: 800;
+    }
+
+    .gallery,
+    .coupons,
+    .night-panel {
+      width: min(100%, 850px);
+      margin: 30px auto 0;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .memory-card {
+      min-height: 210px;
+      padding: 22px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-radius: 8px;
+      border: 2px solid rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: 0 16px 34px rgba(204, 61, 115, 0.15);
+    }
+
+    .memory-icon {
+      width: 66px;
+      height: 66px;
+      margin: 0 auto 16px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: var(--rose);
+      background: linear-gradient(135deg, var(--pink-100), #fff);
+      font-size: 1.8rem;
+      font-weight: 900;
+    }
+
+    .memory-card h3 {
+      margin: 0 0 10px;
+      color: var(--rose);
+      font-size: 1.25rem;
+    }
+
+    .memory-card p,
+    .coupon p {
+      margin: 0;
+      color: var(--soft-ink);
+      line-height: 1.5;
+    }
+
+    .night-panel {
+      padding: 26px;
+      border: 1px solid rgba(255, 134, 189, 0.42);
+      border-radius: 8px;
+      background: rgba(33, 16, 35, 0.86);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+    }
+
+    .night-list li {
+      color: #fff4fb;
+      background: rgba(255, 134, 189, 0.12);
+      border: 1px solid rgba(255, 134, 189, 0.25);
+    }
+
+    .coupons {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      perspective: 1000px;
+    }
+
+    .coupon {
+      display: block;
+      width: 100%;
+      min-height: 168px;
+      padding: 0;
+      border-radius: 26px;
+      background: transparent;
+      perspective: inherit;
+    }
+
+    .coupon-inner {
+      position: relative;
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 168px;
+      transition: transform 650ms ease;
+      transform-style: preserve-3d;
+    }
+
+    .coupon.flipped .coupon-inner {
+      transform: rotateY(180deg);
+    }
+
+    .coupon-face {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      border: 3px solid transparent;
+      border-radius: 26px;
+      backface-visibility: hidden;
+      background:
+        radial-gradient(circle at 16% 20%, rgba(255, 255, 255, 0.95) 0 2px, transparent 3px),
+        radial-gradient(circle at 84% 24%, rgba(255, 242, 168, 0.95) 0 2px, transparent 3px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.6) 50%, transparent 50%) 0 0 / 18px 100% padding-box,
+        linear-gradient(145deg, #fff, #ffe3f1) padding-box,
+        repeating-linear-gradient(135deg, #fff 0 8px, #ff8ab8 8px 13px, #fff2a8 13px 18px, #ffc7df 18px 25px) border-box;
+      box-shadow:
+        0 0 0 5px rgba(255, 255, 255, 0.46),
+        0 16px 34px rgba(204, 61, 115, 0.15);
+    }
+
+    .coupon-front {
+      font-weight: 900;
+      color: var(--rose);
+    }
+
+    .coupon-back {
+      transform: rotateY(180deg);
+    }
+
+    .coupon-label {
+      margin-bottom: 10px;
+      font-size: 0.82rem;
+      font-weight: 900;
+      color: var(--rose);
+      text-transform: uppercase;
+    }
+
+    .full-note {
+      width: min(100%, 780px);
+      min-height: 70vh;
+      margin: 0 auto;
+      padding: clamp(28px, 7vw, 64px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .final-message {
+      display: none;
+      margin: 28px 0 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2rem, 8vw, 4rem);
+      line-height: 1.18;
+      color: var(--rose);
+      text-wrap: balance;
+      animation: fadeIn 700ms ease forwards;
+    }
+
+    .final-message.show {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes drift {
+      0%,
+      100% {
+        transform: translateY(0) rotate(45deg);
+      }
+
+      50% {
+        transform: translateY(-18px) rotate(55deg);
+      }
+    }
+
+    @media (max-width: 760px) {
+      .screen {
+        padding: 20px 14px;
+      }
+
+      .gate {
+        min-height: 72vh;
+        border-radius: 38% 38% 18px 18px;
+      }
+
+      h1 {
+        width: 100%;
+        max-width: 9.8ch;
+        text-align: center;
+      }
+
+      .gate::before,
+      .gate::after {
+        width: 84px;
+        height: 76px;
+        top: -24px;
+      }
+
+      .menu-grid,
+      .gallery,
+      .coupons {
+        grid-template-columns: 1fr;
+      }
+
+      .menu-card,
+      .memory-card,
+      .coupon,
+      .coupon-inner {
+        min-height: 138px;
+      }
+
+      .memory-card {
+        min-height: 176px;
+      }
+
+      .full-note {
+        min-height: 68vh;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 1ms !important;
+        transition-duration: 1ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="background-pattern"></div>
+    <div class="floating-heart"></div>
+    <div class="floating-heart"></div>
+    <div class="floating-heart"></div>
+    <div class="floating-heart"></div>
+
+    <section class="screen active" id="gate-screen" aria-label="Entrance Gate">
+      <div class="gate">
+        <div class="bow" aria-hidden="true"><span></span></div>
+        <h1>For My Favourite Person</h1>
+        <button class="primary-button" type="button" data-go="menu-screen">Enter Our World</button>
+        <p class="signature">Signed by Harsh Nair for Akshara</p>
+      </div>
+    </section>
+
+    <section class="screen" id="menu-screen" aria-label="Main Menu">
+      <div class="shell">
+        <h2>Our Little World</h2>
+        <p class="subtext">Pick a box to unlock a message.</p>
+        <div class="menu-grid">
+          <button class="menu-card" type="button" data-modal="smile-modal">Open When You Need a Smile</button>
+          <button class="menu-card" type="button" data-go="miss-screen">Open When You Miss Me</button>
+          <button class="menu-card" type="button" data-go="alone-screen" data-night="true">Open When We Are Alone Tonight</button>
+          <button class="menu-card" type="button" data-go="coupon-screen">Daily Love Coupons</button>
+          <button class="menu-card final" type="button" data-go="final-screen">Click for your final reminder.</button>
+        </div>
+        <p class="signature">Harsh Nair for Akshara</p>
+      </div>
+    </section>
+
+    <section class="screen" id="miss-screen" aria-label="Open When You Miss Me">
+      <div class="shell">
+        <h2>When You Miss Me</h2>
+        <p class="subtext">A tiny gallery of the moments I replay most.</p>
+        <div class="gallery">
+          <article class="memory-card">
+            <div class="memory-icon">1</div>
+            <h3>Long Calls</h3>
+            <p>I never want to hang up first when you talk about your day.</p>
+          </article>
+          <article class="memory-card">
+            <div class="memory-icon">2</div>
+            <h3>Warm Hugs</h3>
+            <p>The exact spot where your head fits on my chest is my favorite place.</p>
+          </article>
+          <article class="memory-card">
+            <div class="memory-icon">3</div>
+            <h3>Unfiltered Laughs</h3>
+            <p>Nobody makes me laugh as hard as you do.</p>
+          </article>
+        </div>
+        <button class="back-button" type="button" data-go="menu-screen">Back to the boxes</button>
+      </div>
+    </section>
+
+    <section class="screen" id="alone-screen" aria-label="Open When We Are Alone Tonight">
+      <div class="shell">
+        <h2 class="night-title">When We Are Alone Tonight</h2>
+        <p class="subtext">The whole page gets quieter, just for this one.</p>
+        <div class="night-panel">
+          <ul class="night-list">
+            <li>You look breathtaking during the day, but you are irresistible in the dark.</li>
+            <li>I love the way your skin feels under my hands when I pull you close.</li>
+            <li>You drive me crazy with a single look, and you know it.</li>
+            <li>I want you near me with no space, no rush, and zero distractions.</li>
+          </ul>
+        </div>
+        <button class="back-button" type="button" data-go="menu-screen">Back to the boxes</button>
+      </div>
+    </section>
+
+    <section class="screen" id="coupon-screen" aria-label="Love Coupons">
+      <div class="shell">
+        <h2>Daily Love Coupons</h2>
+        <p class="subtext">Tap a coupon to flip it open.</p>
+        <div class="coupons">
+          <button class="coupon" type="button" aria-label="Coupon 1">
+            <span class="coupon-inner">
+              <span class="coupon-face coupon-front">Coupon 1<br>Tap to redeem</span>
+              <span class="coupon-face coupon-back">
+                <span class="coupon-label">Redeem for</span>
+                <p>a forehead kiss, right now.</p>
+              </span>
+            </span>
+          </button>
+          <button class="coupon" type="button" aria-label="Coupon 2">
+            <span class="coupon-inner">
+              <span class="coupon-face coupon-front">Coupon 2<br>Tap to redeem</span>
+              <span class="coupon-face coupon-back">
+                <span class="coupon-label">Redeem for</span>
+                <p>your favorite snacks delivered to your door.</p>
+              </span>
+            </span>
+          </button>
+          <button class="coupon" type="button" aria-label="Coupon 3">
+            <span class="coupon-inner">
+              <span class="coupon-face coupon-front">Coupon 3<br>Tap to redeem</span>
+              <span class="coupon-face coupon-back">
+                <span class="coupon-label">Redeem for</span>
+                <p>a midnight movie marathon with zero phone distractions and endless cuddles.</p>
+              </span>
+            </span>
+          </button>
+          <button class="coupon" type="button" aria-label="Coupon 4">
+            <span class="coupon-inner">
+              <span class="coupon-face coupon-front">Coupon 4<br>Tap to redeem</span>
+              <span class="coupon-face coupon-back">
+                <span class="coupon-label">Redeem for</span>
+                <p>undivided attention all night long.</p>
+              </span>
+            </span>
+          </button>
+        </div>
+        <button class="back-button" type="button" data-go="menu-screen">Back to the boxes</button>
+      </div>
+    </section>
+
+    <section class="screen" id="final-screen" aria-label="Final Screen">
+      <div class="full-note">
+        <div class="bow" aria-hidden="true"><span></span></div>
+        <h2>Final Reminder</h2>
+        <button class="soft-button" type="button" id="final-button">Click for your final reminder.</button>
+        <p class="final-message" id="final-message">I am yours, completely. Thank you for choosing me every single day.</p>
+        <p class="signature">Harsh Nair for Akshara</p>
+        <button class="back-button" type="button" data-go="menu-screen">Back to the boxes</button>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" id="smile-modal" role="dialog" aria-modal="true" aria-labelledby="smile-title">
+    <div class="note">
+      <h3 id="smile-title">For Your Smile</h3>
+      <ul class="note-list">
+        <li>You are the sweetest part of every day.</li>
+        <li>Your voice instantly calms my head down.</li>
+        <li>You make silly moments fun and hard days easy.</li>
+        <li>You look stunning even when you just wake up in an oversized shirt.</li>
+      </ul>
+      <button class="close-button" type="button" data-close>Close note</button>
+    </div>
+  </div>
+
+  <script>
+    const screens = document.querySelectorAll(".screen");
+    const goButtons = document.querySelectorAll("[data-go]");
+    const modalButtons = document.querySelectorAll("[data-modal]");
+    const modal = document.getElementById("smile-modal");
+    const closeButton = document.querySelector("[data-close]");
+    const coupons = document.querySelectorAll(".coupon");
+    const finalButton = document.getElementById("final-button");
+    const finalMessage = document.getElementById("final-message");
+
+    function playLockClick() {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+
+      if (!AudioContext) {
+        return;
+      }
+
+      const audioContext = new AudioContext();
+      const oscillator = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(190, audioContext.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(80, audioContext.currentTime + 0.08);
+      gain.gain.setValueAtTime(0.09, audioContext.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.09);
+
+      oscillator.connect(gain);
+      gain.connect(audioContext.destination);
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + 0.1);
+    }
+
+    function showScreen(screenId, nightMode) {
+      screens.forEach((screen) => {
+        screen.classList.toggle("active", screen.id === screenId);
+      });
+
+      document.body.classList.toggle("night", Boolean(nightMode));
+
+      if (nightMode) {
+        playLockClick();
+      }
+    }
+
+    goButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        showScreen(button.dataset.go, button.dataset.night === "true");
+      });
+    });
+
+    modalButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = document.getElementById(button.dataset.modal);
+        target.classList.add("open");
+      });
+    });
+
+    closeButton.addEventListener("click", () => {
+      modal.classList.remove("open");
+    });
+
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) {
+        modal.classList.remove("open");
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        modal.classList.remove("open");
+      }
+    });
+
+    coupons.forEach((coupon) => {
+      coupon.addEventListener("click", () => {
+        coupon.classList.toggle("flipped");
+      });
+    });
+
+    finalButton.addEventListener("click", () => {
+      finalMessage.classList.add("show");
+      finalButton.style.display = "none";
+    });
+  </script>
+</body>
+</html>
