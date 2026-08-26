@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>For Akshara</title>
+  <style>
+    :root {
+      --pink-50: #fff5f8;
+      --pink-100: #ffe3ee;
+      --pink-200: #ffbcd7;
+      --pink-300: #ff94bf;
+      --pink-500: #ff4d8d;
+      --rose: #e60067;
+      --kitty-red: #ff2d55;
+      --kitty-yellow: #ffd000;
+      --ink: #4a1e34;
+      --soft-ink: #7a3e5c;
+      --shadow: 0 20px 50px rgba(230, 0, 103, 0.18);
+      --dark-bg: #1f0b18;
+      --dark-panel: #331328;
+      --dark-pink: #ff85b8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden;
+      font-family: "Quicksand", "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 15%, rgba(255, 255, 255, 0.9) 0 8%, transparent 9%),
+        radial-gradient(circle at 85% 20%, rgba(255, 208, 0, 0.3) 0 6%, transparent 7%),
+        linear-gradient(135deg, #fff5f8 0%, #ffdeec 50%, #ffc8df 100%);
+      transition: background 0.5s ease, color 0.5s ease;
+    }
+
+    body.night {
+      color: #fff0f6;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255, 77, 141, 0.2) 0 8%, transparent 9%),
+        linear-gradient(135deg, #180512 0%, #290d21 50%, #3d1431 100%);
+    }
+
+    button {
+      border: 0;
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    .app {
+      position: relative;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .background-pattern {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.6;
+      background-image:
+        radial-gradient(circle, rgba(255, 77, 141, 0.2) 2px, transparent 2px),
+        radial-gradient(circle, rgba(255, 255, 255, 0.9) 2px, transparent 2px);
+      background-position: 0 0, 25px 25px;
+      background-size: 50px 50px;
+      z-index: -2;
+    }
+
+    .floating-bow {
+      position: fixed;
+      font-size: 1.4rem;
+      pointer-events: none;
+      opacity: 0.5;
+      animation: floatUp 10s ease-in-out infinite;
+      z-index: -1;
+    }
+
+    .floating-bow:nth-child(2) { left: 10%; top: 20%; animation-delay: 0s; }
+    .floating-bow:nth-child(3) { right: 12%; top: 15%; animation-delay: -3s; }
+    .floating-bow:nth-child(4) { left: 15%; bottom: 15%; animation-delay: -6s; }
+    .floating-bow:nth-child(5) { right: 18%; bottom: 12%; animation-delay: -2s; }
+
+    .screen {
+      display: none;
+      min-height: 100vh;
+      padding: 30px 20px;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(15px);
+    }
+
+    .screen.active {
+      display: flex;
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    .shell {
+      width: min(100%, 850px);
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .kitty-face {
+      width: 90px;
+      height: 70px;
+      background: #ffffff;
+      border: 3px solid #ff7fae;
+      border-radius: 50% 50% 45% 45%;
+      position: relative;
+      margin: 0 auto 15px;
+      box-shadow: 0 8px 20px rgba(255, 77, 141, 0.15);
+    }
+
+    .kitty-face::before,
+    .kitty-face::after {
+      content: "";
+      position: absolute;
+      top: -12px;
+      width: 24px;
+      height: 24px;
+      background: #ffffff;
+      border: 3px solid #ff7fae;
+    }
+
+    .kitty-face::before {
+      left: 6px;
+      border-radius: 80% 20% 40% 10%;
+      transform: rotate(-15deg);
+    }
+
+    .kitty-face::after {
+      right: 6px;
+      border-radius: 20% 80% 10% 40%;
+      transform: rotate(15deg);
+    }
+
+    .kitty-bow {
+      position: absolute;
+      top: -10px;
+      right: -5px;
+      font-size: 1.6rem;
+      z-index: 2;
+    }
+
+    .kitty-eyes {
+      position: absolute;
+      top: 32px;
+      left: 24px;
+      width: 8px;
+      height: 10px;
+      background: #333;
+      border-radius: 50%;
+      box-shadow: 34px 0 0 #333;
+    }
+
+    .kitty-nose {
+      position: absolute;
+      top: 40px;
+      left: 42px;
+      width: 7px;
+      height: 5px;
+      background: var(--kitty-yellow);
+      border-radius: 50%;
+    }
+
+    .gate {
+      position: relative;
+      width: min(100%, 580px);
+      padding: 50px 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      border: 4px solid #ffffff;
+      border-radius: 36px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(8px);
+      box-shadow: var(--shadow);
+    }
+
+    h1, h2 {
+      margin: 0;
+      font-weight: 800;
+      color: var(--rose);
+      line-height: 1.2;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 6vw, 3.2rem);
+    }
+
+    h2 {
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+    }
+
+    body.night h2,
+    body.night .night-title {
+      color: var(--dark-pink);
+    }
+
+    .subtext {
+      margin: 10px auto 0;
+      max-width: 32rem;
+      color: var(--soft-ink);
+      font-size: 1.1rem;
+      line-height: 1.5;
+    }
+
+    body.night .subtext {
+      color: #ffd6e7;
+    }
+
+    .primary-button,
+    .soft-button,
+    .back-button {
+      padding: 14px 28px;
+      border-radius: 999px;
+      font-weight: 700;
+      color: #ffffff;
+      background: linear-gradient(135deg, #ff659f, #ff2d7a);
+      box-shadow: 0 10px 24px rgba(255, 45, 122, 0.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .primary-button:hover,
+    .soft-button:hover,
+    .back-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(255, 45, 122, 0.4);
+    }
+
+    .signature {
+      margin-top: 15px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--soft-ink);
+    }
+
+    .menu-grid {
+      width: min(100%, 720px);
+      margin: 30px auto 0;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .menu-card {
+      min-height: 130px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid #ffffff;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.85);
+      color: var(--ink);
+      font-size: 1.15rem;
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(230, 0, 103, 0.08);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .menu-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 30px rgba(230, 0, 103, 0.18);
+    }
+
+    .menu-card.final {
+      grid-column: 1 / -1;
+      min-height: 90px;
+      background: linear-gradient(135deg, #ffffff, #fff2a8);
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      visibility: hidden;
+      opacity: 0;
+      background: rgba(46, 15, 30, 0.4);
+      backdrop-filter: blur(6px);
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      z-index: 10;
+    }
+
+    .modal.open {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .note {
+      width: min(100%, 500px);
+      padding: 30px 24px;
+      border-radius: 28px;
+      border: 3px solid #ffffff;
+      background: #ffffff;
+      box-shadow: var(--shadow);
+    }
+
+    .note-list,
+    .night-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .note-list li,
+    .night-list li {
+      margin: 12px 0;
+      padding: 14px 18px;
+      border-radius: 18px;
+      background: var(--pink-50);
+      font-size: 1.05rem;
+      line-height: 1.4;
+      text-align: left;
+    }
+
+    .night-panel {
+      width: min(100%, 650px);
+      margin: 25px auto 0;
+      padding: 24px;
+      border: 2px solid rgba(255, 133, 184, 0.4);
+      border-radius: 28px;
+      background: var(--dark-panel);
+    }
+
+    .night-list li {
+      color: #fff0f6;
+      background: rgba(255, 133, 184, 0.12);
+    }
+
+    .gallery,
+    .coupons {
+      width: min(100%, 800px);
+      margin: 25px auto 0;
+      display: grid;
+      gap: 16px;
+    }
+
+    .gallery {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .memory-card {
+      padding: 24px 18px;
+      border-radius: 24px;
+      border: 3px solid #ffffff;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 10px 25px rgba(230, 0, 103, 0.08);
+    }
+
+    .memory-card h3 {
+      margin: 10px 0;
+      color: var(--rose);
+      font-size: 1.2rem;
+    }
+
+    .memory-card p,
+    .coupon p {
+      margin: 0;
+      color: var(--soft-ink);
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+
+    .coupons {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .coupon {
+      min-height: 150px;
+      padding: 0;
+      border-radius: 24px;
+      background: transparent;
+      perspective: 1000px;
+    }
+
+    .coupon-inner {
+      position: relative;
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 150px;
+      transition: transform 0.6s ease;
+      transform-style: preserve-3d;
+    }
+
+    .coupon.flipped .coupon-inner {
+      transform: rotateY(180deg);
+    }
+
+    .coupon-face {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      border: 3px solid #ffffff;
+      border-radius: 24px;
+      backface-visibility: hidden;
+      background: #ffffff;
+      box-shadow: 0 8px 20px rgba(230, 0, 103, 0.08);
+    }
+
+    .coupon-front {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--rose);
+    }
+
+    .coupon-back {
+      transform: rotateY(180deg);
+      background: #fff8fc;
+    }
+
+    .coupon-label {
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--kitty-red);
+      text-transform: uppercase;
+    }
+
+    .full-note {
+      width: min(100%, 650px);
+      margin: 0 auto;
+      padding: 40px 24px;
+      border-radius: 32px;
+      background: #ffffff;
+      border: 3px solid #ffdeec;
+      box-shadow: var(--shadow);
+    }
+
+    .final-message {
+      display: none;
+      margin: 25px 0 0;
+      font-size: clamp(1.4rem, 4vw, 1.8rem);
+      line-height: 1.4;
+      font-weight: 800;
+      color: var(--rose);
+    }
+
+    .final-message.show {
+      display: block;
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes floatUp {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-15px) rotate(10deg); }
+    }
+
+    @media (max-width: 700px) {
+      .menu-grid,
+      .gallery,
+      .coupons {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="background-pattern"></div>
+    <div class="floating-bow">🎀</div>
+    <div class="floating-bow">✨</div>
+    <div class="floating-bow">🎀</div>
+    <div class="floating-bow">💖</div>
+
+    <section class="screen active" id="gate-screen" aria-label="Entrance Gate">
+      <div class="gate">
+        <div class="kitty-face">
+          <span class="kitty-bow">🎀</span>
+          <div class="kitty-eyes"></div>
+          <div class="kitty-nose"></div>
+        </div>
+        <h1>For My Favourite Person</h1>
+        <p class="subtext">A tiny pink corner built entirely for you, Akshara.</p>
+        <button class="primary-button" type="button" data-go="menu-screen">Enter Our World</button>
+        <p class="signature">Signed by Harsh Nair for Akshara</p>
+      </div>
+    </section>
+
+    <section class="screen" id="menu-screen" aria-label="Main Menu">
+      <div class="shell">
+        <div class="kitty-face">
+          <span class="kitty-bow">🎀</span>
+          <div class="kitty-eyes"></div>
+          <div class="kitty-nose"></div>
+        </div>
+        <h2>Our Little World</h2>
+        <p class="subtext">Pick a card to open a message.</p>
+        <div class="menu-grid">
+          <button class="menu-card" type="button" data-modal="smile-modal">Open When You Need a Smile 🎀</button>
+          <button class="menu-card" type="button" data-go="miss-screen">Open When You Miss Me 🌸</button>
+          <button class="menu-card" type="button" data-go="alone-screen" data-night="true">Open When It Is Late At Night 🌙</button>
+          <button class="menu-card" type="button" data-go="coupon-screen">Daily Love Coupons 🥟</button>
+          <button class="menu-card final" type="button" data-go="final-screen">Click for your final reminder ✨</button>
+        </div>
+        <p class="signature">Harsh Nair for Akshara</p>
+      </div>
+    </section>
+
+    <section class="screen" id="miss-screen" aria-label="Open When You Miss Me">
+      <div class="shell">
+        <h2>When You Miss Me</h2>
+        <p class="subtext">The moments I keep replaying in my head.</p>
+        <div class="gallery">
+          <article class="memory-card">
+            <h3>📞 Midnight Calls</h3>
+            <p>I never want to hang up first when you talk about your day.</p>
+          </article>
+          <article class="memory-card">
+            <h3>🥟 Steaming Momos</h3>
+            <p>Every hot plate of momos tastes ten times better when I share them with you.</p>
+          </article>
+          <article class="memory-card">
+            <h3>🫂 Tight Hugs</h3>
+            <p>The exact spot where your head rests on my chest is my absolute safe place.</p>
+          </article>
+        </div>
+        <br>
+        <button class="back-button" type="button" data-go="menu-screen">Back to the boxes</button>
+      </div>
+    </section>
+
+    <section class="screen" id="alone-screen" aria-label="Late At Night">
+      <div class="shell">
+        <h2 class="night-title">Late At Night With You 🌙</h2>
+        <p class="subtext">When everything goes quiet and it is just the two of us.</p>
+        <div class="night-panel">
+          <ul class="night-list">
+            <li>I love pulling you close until there is no space between us.</li>
+            <li>You look completely breathtaking in my oversized shirts.</li>
+            <li>Running my hands through your hair while you fall asleep next to me is my favourite thing.</li>
+            <li>I want zero distractions, just your heartbeat against mine all night.</li>
+          </ul>
+        </div>
+        <br>
+        <button class="back-button" type="button" data-go="menu-screen">Back to the boxes</button>
+      </div>
+    </section>
+
+    <section class="screen" id="coupon-screen" aria-label="Love Coupons">
+      <div class="shell">
+        <h2>Daily Love Coupons</h2>
+        <p class="subtext">Tap any coupon to flip and redeem it.</p>
+        <div class="coupons">
+          <button class="coupon" type="button" aria-label="Coupon 1">
+            <span class="coupon-inner">
+              <span class="coupon-face coupon-front">Coupon 1<br>Tap to redeem 🥟</span>
+              <span class="coupon-face coupon-back">
+                <span class="coupon-label">Redeem for</span>
+                <p>A fresh plate of piping hot momos and your favourite drinks delivered to you.</p>
+              </span>
+            </span>
+          </button>
+          <button class="coupon" type="button" aria-label="Coupon 2">
+            <span class="coupon-inner">
+              <span class="coupon-face coupon-front">Coupon 2<br>Tap to redeem 🎀</span>
+              <span class="coupon-face coupon-back">
+                <span class="coupon-label">Redeem for</span>
+                <p>One endless, warm forehead kiss and an unbroken hug.</p>
+              </span>
+            </span>
+          </button>
+          <button class="coupon" type="button" aria-label="Coupon 3">
+            <span class="coupon-inner">
+              <span class="coupon-face coupon-front">Coupon 3<br>Tap to redeem 🎬</span>
+              <span class="coupon-face coupon-back">
+                <span class="coupon-label">Redeem for</span>
+                <p>A late-night movie marathon with cozy blankets and zero phone distractions.</p>
+              </span>
+            </span>
+          </button>
+          <button class="coupon" type="button" aria-label="Coupon 4">
+            <span class="coupon-inner">
+              <span class="coupon-face coupon-front">Coupon 4<br>Tap to redeem 💖</span>
+              <span class="coupon-face coupon-back">
+                <span class="coupon-label">Redeem for</span>
+                <p>My completely undivided attention and head scratches whenever you want.</p>
+              </span>
+            </span>
+          </button>
+        </div>
+        <br>
+        <button class="back-button" type="button" data-go="menu-screen">Back to the boxes</button>
+      </div>
+    </section>
+
+    <section class="screen" id="final-screen" aria-label="Final Screen">
+      <div class="full-note">
+        <div class="kitty-face">
+          <span class="kitty-bow">🎀</span>
+          <div class="kitty-eyes"></div>
+          <div class="kitty-nose"></div>
+        </div>
+        <h2>One Last Thing</h2>
+        <br>
+        <button class="soft-button" type="button" id="final-button">Click for your final reminder</button>
+        <p class="final-message" id="final-message">You make my whole world softer and brighter, Akshara. I am yours, completely and always. 💖</p>
+        <p class="signature">Harsh Nair for Akshara</p>
+        <br>
+        <button class="back-button" type="button" data-go="menu-screen">Back to the boxes</button>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" id="smile-modal" role="dialog" aria-modal="true">
+    <div class="note">
+      <h3 style="margin-top:0; color:var(--rose);">Reasons You Make Me Smile 🎀</h3>
+      <ul class="note-list">
+        <li>Your laugh instantly fixes my entire day.</li>
+        <li>How cute you look whenever your favourite food arrives.</li>
+        <li>The way you light up when you talk about things you love.</li>
+        <li>You are effortlessly my favourite person in every room.</li>
+      </ul>
+      <br>
+      <button class="primary-button" type="button" data-close>Close note</button>
+    </div>
+  </div>
+
+  <script>
+    const screens = document.querySelectorAll(".screen");
+    const goButtons = document.querySelectorAll("[data-go]");
+    const modalButtons = document.querySelectorAll("[data-modal]");
+    const modal = document.getElementById("smile-modal");
+    const closeButton = document.querySelector("[data-close]");
+    const coupons = document.querySelectorAll(".coupon");
+    const finalButton = document.getElementById("final-button");
+    const finalMessage = document.getElementById("final-message");
+
+    function showScreen(screenId, nightMode) {
+      screens.forEach((screen) => {
+        screen.classList.toggle("active", screen.id === screenId);
+      });
+      document.body.classList.toggle("night", Boolean(nightMode));
+    }
+
+    goButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        showScreen(button.dataset.go, button.dataset.night === "true");
+      });
+    });
+
+    modalButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = document.getElementById(button.dataset.modal);
+        target.classList.add("open");
+      });
+    });
+
+    closeButton.addEventListener("click", () => {
+      modal.classList.remove("open");
+    });
+
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) {
+        modal.classList.remove("open");
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        modal.classList.remove("open");
+      }
+    });
+
+    coupons.forEach((coupon) => {
+      coupon.addEventListener("click", () => {
+        coupon.classList.toggle("flipped");
+      });
+    });
+
+    finalButton.addEventListener("click", () => {
+      finalMessage.classList.add("show");
+      finalButton.style.display = "none";
+    });
+  </script>
+</body>
+</html>
